@@ -1,0 +1,39 @@
+Assignment 4: Website Monitoring
+Traffic on a busy website often displays short-term and long-term cyclical behavior, for example flowing during the day and ebbing at night. Over the long term, one usually hopes to see trends of increasing traffic. Monitoring is vital for understanding the behavior of your website, both in the short term to check health and in the long term to plan capacity.
+
+Alerting systems should provide notification you whenever there is a sudden, unexpected change in traffic (increase or drop), sudden change in the number of errors served1, significant change in latency (average, or 90th percentile), or any other sudden change in some performance metric.
+
+One way to monitor the site is to have the application count various parameters, which the monitoring system periodically scrapes to collect into a time series. The monitoring system can then construct rate graphs to display trends, such as this one:  
+The graph is a useful diagnostic tool when combined with other information such text log files2. On their own, the graphs are generally not enough to determine whether the peaks and troughs are normal behavior or indicate some sort of outage. Typically, a production dashboard would show graphs of numerous related variables and allow the viewer to select the timeframe to display, zooming in or out as needed. Fortunately, all that is outside the scope of this assignment.
+
+Here is code to run the CS390 Time Server website. Run it on one of the Linux Lab computers on the port of your choosing (default 8080) and hit the site to get the current time of day. Hitting "http://site:8080/stats" will return counters for the number of 200s, 404s, and 500s served. Hitting "http://site:8080/fail" simulates an internal server error and causes the server to respond with a 500 error code. Any other address returns 404.
+
+Part 1: Traffic Generator
+Write a script, trafficgen, that generates traffic to your instance of the time server. The script must be able to maintain at least 500 requests per second3.
+Your script should take the following command-line arguments:
+	•	--url url: url to hit
+	•	--rps rps: desired average requests per second
+	•	--jitter jitter: floating-point number in the range of [0..1] representing the shakiness of the rate. The actual request rate should be a random number between rps * (1.0 - jitter) and rps * (1.0 + jitter)4.
+If you're feeling ambitious, try implementing variants that display random cyclical or intermittent behavior.
+
+Part 2: Stats Collector
+Write a script, collector, That periodically collects data from the stats page and saves it in a tab-separated file, where each record contains the Unix time (seconds since 1970) the collection was made and the count of 200s, 404s, and 500s.
+Use a command-line flag --interval to control the collection interval.
+Run the script for an hour against your the web site being fed traffic, collecting data every 10 seconds.
+
+Part 3: Dashboard
+Write a script, plot that takes the data collected by collector and generates the 1-minute rate graph of the 3 timeseries, similar to the one shown above (except the graph should should show approximately constant rates according to the load you're generating).
+The 1-minute rate is the difference between values at Tnow and T60-seconds-ago divided by 60 seconds to get a Request Per Second (RPS) rate. Similarly, we could calculate the 10-minute rate or the 10-second rate. The former would be smoother, while the latter will be more responsive to small rate changes.
+The graph may be generated using gnuplot. The image may be a gif, jpg or png file.
+If you're feeling ambitious, add a parameter --delta_t and compare 1-minute and 10-minute graphs.
+
+Notes and Hints
+If you need to create temporary files, your script should clean up after them. Output files are not "temporary".
+
+Consider using wget or curl with a Bash or Perl script . If you're using Perl, consider using the LWP::Simple (Library for WWW in Perl) module. If using Python, consider using the urllib2 module.
+
+Footnotes
+1  Any 500s served at all is cause for concern, but a sudden unexplained drop is also a problem that should be investigated: it may mean a fault in the monitoring system or that the server has stopped serving entirely.
+2  Production log messages typically include timestamps. The graph can identify a time period of interest which allows the engineer to narrow the range of messages to search through.
+3  500 request per second exceeds any expected load on the server, but if it were not the case and we wanted to generate higher traffic, we would just run multiple generators, using multiple machines if necessary.
+4  This is an example of an ambigous spec: is the intention to vary the rate randomly within the interval or to randomly pick a fixed rate within the interval. Specs are hard to write. Deal with it. Hint: which interpretation makes more sense for the problem?
