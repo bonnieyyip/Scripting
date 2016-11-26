@@ -1,0 +1,194 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\fonttbl\f0\fswiss\fcharset0 ArialMT;\f1\fswiss\fcharset0 Helvetica;\f2\fmodern\fcharset0 Courier-Bold;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green0\blue233;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{none\}}{\leveltext\leveltemplateid101\'00;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}}
+\margl1440\margr1440\vieww14440\viewh8920\viewkind0
+\deftab720
+\pard\pardeftab720\sa321
+
+\f0\b\fs48 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Assignment 4: Website Monitoring\
+\pard\pardeftab720\sa240
+
+\b0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Traffic on a busy website often displays short-term and long-term cyclical behavior, for example flowing during the day and ebbing at night. Over the long term, one usually hopes to see trends of increasing traffic. {\field{\*\fldinst{HYPERLINK "http://en.wikipedia.org/wiki/Website_monitoring"}}{\fldrslt \cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 \outl0\strokewidth0 \strokec3 Monitoring}} is vital for understanding the behavior of your website, both in the short term to check health and in the long term to plan capacity.\
+Alerting systems should provide notification you whenever there is a sudden, unexpected change in traffic (increase or drop), sudden change in the number of {\field{\*\fldinst{HYPERLINK "http://en.wikipedia.org/wiki/List_of_HTTP_status_codes"}}{\fldrslt \cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 \outl0\strokewidth0 \strokec3 errors}} served{\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04.html#footnote_1"}}{\fldrslt 
+\fs20 \cf3 \expnd0\expndtw0\kerning0
+\super \outl0\strokewidth0 \strokec3 1}}, significant change in latency (average, or 90th percentile), or any other sudden change in some performance metric.\
+One way to monitor the site is to have the application count various parameters, which the monitoring system periodically {\field{\*\fldinst{HYPERLINK "https://en.wikipedia.org/wiki/Web_scraping"}}{\fldrslt \cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 \outl0\strokewidth0 \strokec3 scrapes}} to collect into a {\field{\*\fldinst{HYPERLINK "https://en.wikipedia.org/wiki/Time_series"}}{\fldrslt \cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 \outl0\strokewidth0 \strokec3 time series}}. The monitoring system can then construct rate graphs to display trends, such as this one: \uc0\u8232 
+\f1 \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {{\NeXTGraphic rps.png \width9600 \height7200
+}¬}
+\f0 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+The graph is a useful diagnostic tool when combined with other information such text log files{\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04.html#footnote_2"}}{\fldrslt 
+\fs20 \cf3 \expnd0\expndtw0\kerning0
+\super \outl0\strokewidth0 \strokec3 2}}. On their own, the graphs are generally not enough to determine whether the peaks and troughs are normal behavior or indicate some sort of outage. Typically, a production dashboard would show graphs of numerous related variables and allow the viewer to select the timeframe to display, zooming in or out as needed. Fortunately, all that is outside the scope of this assignment.\
+Here is code to run the {\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04/timeserver.tgz"}}{\fldrslt \cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 \outl0\strokewidth0 \strokec3 CS390 Time Server}} website. Run it on one of the Linux Lab computers on the port of your choosing (default 8080) and hit the site to get the current time of day. Hitting "http://
+\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 site
+\i0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 :8080/stats" will return counters for the number of {\field{\*\fldinst{HYPERLINK "http://en.wikipedia.org/wiki/List_of_HTTP_status_codes"}}{\fldrslt \cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 \outl0\strokewidth0 \strokec3 200s, 404s, and 500s}} served. Hitting "http://
+\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 site
+\i0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 :8080/fail" simulates an internal server error and causes the server to respond with a 500 error code. Any other address returns 404.\
+\pard\pardeftab720\sa298
+
+\b\fs36 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Part 1: Traffic Generator\
+\pard\pardeftab720\sa240
+
+\b0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Write a script, 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 trafficgen
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 , that generates traffic to your instance of the time server. The script must be able to maintain at least 500 requests per second{\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04.html#footnote_3"}}{\fldrslt 
+\fs20 \cf3 \expnd0\expndtw0\kerning0
+\super \outl0\strokewidth0 \strokec3 3}}.\
+\pard\pardeftab720
+\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Your script should take the following command-line arguments:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa80
+\ls1\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 --url 
+\f0\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 url
+\i0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 : url to hit\
+\ls1\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 --rps 
+\f0\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 rps
+\i0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 : desired average requests per second\
+\ls1\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 --jitter 
+\f0\i \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 jitter
+\i0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 : floating-point number in the range of [0..1] representing the shakiness of the rate. The actual request rate should be a random number between 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 rps * (1.0 - jitter)
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  and 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 rps * (1.0 + jitter){\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04.html#footnote_4"}}{\fldrslt 
+\f0\b0\fs20 \cf3 \expnd0\expndtw0\kerning0
+\super \outl0\strokewidth0 \strokec3 4}}
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 .\
+\pard\pardeftab720\sa240
+\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 If you're feeling ambitious, try implementing variants that display random cyclical or intermittent behavior.\
+\pard\pardeftab720\sa298
+
+\b\fs36 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Part 2: Stats Collector\
+\pard\pardeftab720\sa240
+
+\b0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Write a script, 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 collector
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 , That periodically collects data from the stats page and saves it in a tab-separated file, where each record contains the {\field{\*\fldinst{HYPERLINK "https://en.wikipedia.org/wiki/Unix_time"}}{\fldrslt \cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 \outl0\strokewidth0 \strokec3 Unix time}} (seconds since 1970) the collection was made and the count of 200s, 404s, and 500s.\
+Use a command-line flag 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 --interval
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  to control the collection interval.\
+Run the script for an hour against your the web site being fed traffic, collecting data every 10 seconds.\
+\pard\pardeftab720\sa298
+
+\b\fs36 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Part 3: Dashboard\
+\pard\pardeftab720\sa240
+
+\b0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Write a script, 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 plot
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  that takes the data collected by 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 collector
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  and generates the 1-minute rate graph of the 3 timeseries, similar to the one shown above (except the graph should should show approximately constant rates according to the load you're generating).\
+The 1-minute rate is the difference between values at 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 T
+\f0\fs20 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 now
+\b0\fs24 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0  and 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 T
+\f0\fs20 \expnd0\expndtw0\kerning0
+\sub \outl0\strokewidth0 60-seconds-ago
+\b0\fs24 \expnd0\expndtw0\kerning0
+\nosupersub \outl0\strokewidth0  divided by 60 seconds to get a Request Per Second (RPS) rate. Similarly, we could calculate the 10-minute rate or the 10-second rate. The former would be smoother, while the latter will be more responsive to small rate changes.\
+The graph may be generated using gnuplot. The image may be a gif, jpg or png file.\
+If you're feeling ambitious, add a parameter 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 --delta_t
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  and compare 1-minute and 10-minute graphs.\
+\pard\pardeftab720\sa298
+
+\b\fs36 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Notes and Hints\
+\pard\pardeftab720\sa240
+
+\b0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 If you need to create temporary files, your script should clean up after them. Output files are not "temporary".\
+\
+Consider using 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 wget
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  or 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 curl
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  with a Bash or Perl script . If you're using Perl, consider using the 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 LWP::Simple
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  (Library for WWW in Perl) module. If using Python, consider using the 
+\f2\b \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 urllib2
+\f0\b0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0  module.\
+\pard\pardeftab720\sa298
+
+\b\fs36 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 Footnotes\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa80
+\ls2\ilvl0
+\b0\fs20 \cf3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 		{\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04.html#text_1"}}{\fldrslt \expnd0\expndtw0\kerning0
+\ul \outl0\strokewidth0 \strokec3 1}}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \'a0\'a0Any 500s served at all is cause for concern, but a sudden unexplained drop is also a problem that should be investigated: it may mean a fault in the monitoring system or that the server has stopped serving entirely.\
+\ls2\ilvl0\cf3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 		{\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04.html#text_2"}}{\fldrslt \expnd0\expndtw0\kerning0
+\ul \outl0\strokewidth0 \strokec3 2}}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \'a0\'a0Production log messages typically include timestamps. The graph can identify a time period of interest which allows the engineer to narrow the range of messages to search through.\
+\ls2\ilvl0\cf3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 		{\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04.html#text_3"}}{\fldrslt \expnd0\expndtw0\kerning0
+\ul \outl0\strokewidth0 \strokec3 3}}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \'a0\'a0500 request per second exceeds any expected load on the server, but if it were not the case and we wanted to generate higher traffic, we would just run multiple generators, using multiple machines if necessary.\
+\ls2\ilvl0\cf3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 		{\field{\*\fldinst{HYPERLINK "http://courses.washington.edu/css390/assignment-04.html#text_4"}}{\fldrslt \expnd0\expndtw0\kerning0
+\ul \outl0\strokewidth0 \strokec3 4}}\cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \'a0\'a0This is an example of an ambigous spec: is the intention to vary the rate randomly within the interval or to randomly pick a fixed rate within the interval. Specs are hard to write. Deal with it. Hint: which interpretation makes more sense for the problem?\
+}
